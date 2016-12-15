@@ -9,31 +9,33 @@ import { Text, AppRegistry, Image, StyleSheet, View, TextInput, Button, Alert, N
 import React, {Component} from 'react';
 
 class Register extends Component {
+
+  
+
   login(id, message) {
     this.props.navigator.push({
-        id: id,
-      passProps: {
-        message: message,
-        goBack: this.goBack,
-      }
-    })
+        id: id, passProps: {
+                  message: message,
+                  goBack: this.goBack,
+                }
+        })
   }
 
   submitRegister(id, name, email, hp,) {
     this.props.navigator.push({
-        id: id,
-      passProps: {
-        name : name,
-        email : email,
-        hp : hp,
-        goBack: this.goBack,
-      }
+        id: id, passProps: {
+                  name : name,
+                  email : email,
+                  hp : hp,
+                  goBack: this.goBack,
+                }
     })
   }
 
-    goBack() {
-        this.props.navigator.pop()
-    }
+  goBack() {
+      this.props.navigator.pop()
+  }
+    
   constructor(props) {
         super(props);
         this.state = { 
@@ -41,15 +43,31 @@ class Register extends Component {
             hp : 'No Handphone',
             email : 'Email',
             province: [],
+            company: [],
             selectedProvince: '',
+            selectedCompany: ''
         };
     }
 
     componentWillMount() {
+      console.log('test');
       fetch('http://223.27.24.155/api_pazpo/v2/LoadAllCompanyArea')
         .then((response) => response.json())
         .then((responseJson) => {
           this.setState({ province: responseJson.province.data });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+
+    apiCompany(pProvinceID){
+      console.log('http://223.27.24.155/api_pazpo/v2/LoadAllCompany?pProvinceID='+pProvinceID);
+      fetch('http://223.27.24.155/api_pazpo/v2/LoadAllCompany?pProvinceID='+pProvinceID)
+        .then((response) => response.json())
+        .then((responseJson) => {
+          this.setState({ company: responseJson.company.data });
+          console.log('Company has been loaded');
         })
         .catch((error) => {
           console.error(error);
@@ -91,18 +109,17 @@ class Register extends Component {
 
             <Picker
                 selectedValue={this.state.selectedProvince}
-                onValueChange={
-                  
-                   this.onValueChange.bind(this, 'selectedProvince')
-                }>
+                mode="dropdown"
+                onValueChange={this.onValueChangeArea.bind(this, 'selectedProvince')}>
                 
                     {this.state.province.map((l,i) => {return <Picker.Item value={l.ProvinceID} label={l.ProvinceName} key={l.ProvinceID}  /> })}
             </Picker>
 
             <Picker
               selectedValue={this.state.cities}
-              onValueChange={(city) => this.setState({cities: city})}>
-              <Picker.Item label="Pilih Area" value="" />
+              mode="dropdown"
+              onValueChange={this.onValueChangeCompany.bind(this, 'selectedCompany')}>
+              {this.state.company.map((l,i) => {return <Picker.Item value={l.CompanyID} label={l.CompanyName} key={l.CompanyID}  /> })}
               
             </Picker>
 
@@ -131,11 +148,22 @@ class Register extends Component {
   }
 
 
-  onValueChange = (key: string, value: string) => {
+  onValueChangeArea = (key: string, value: string) => {
     const newState = {};
     newState[key] = value;
     this.setState(newState);
+    console.log(newState);
+    console.log(key);
     console.log(value);
+
+    this.apiCompany(value);
+    
+  };
+
+  onValueChangeCompany = (key: string, value: string) => {
+    const newState = {};
+    newState[key] = value;
+    this.setState(newState);
   };
 }
 

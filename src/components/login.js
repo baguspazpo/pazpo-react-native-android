@@ -14,12 +14,15 @@ import {
 } from 'react-native';
 
 class Login extends Component {
-    componentWillUnmount(){
-      BackAndroid.removeEventListener('hardwareBackPress', () => {
-          if (this.props.navigator && this.props.navigator.getCurrentRoutes().length > 1) {
+    componentWillMount(){
+      
+      BackAndroid.addEventListener('hardwareBackPress', () => {
+        console.log(this.props.navigator.getCurrentRoutes().length);
+          if (this.props.navigator.getCurrentRoutes().length > 1) {
               this.props.navigator.pop();
               return true;
           }
+
           return false;
       });
   }
