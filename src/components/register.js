@@ -102,6 +102,7 @@ class Register extends Component {
             <TextInput
               style={styles.TextInput}
               onChangeText={(hp) => this.setState({hp})}
+              keyboardType = 'numeric'
               placeholder="No Handphone"
               keyboardType="phone-pad"
               returnKeyType="next"
@@ -164,9 +165,6 @@ class Register extends Component {
     const newState = {};
     newState[key] = value;
     this.setState(newState);
-    console.log(newState);
-    console.log(key);
-    console.log(value);
 
     this.apiCompany(value);
     
@@ -193,13 +191,13 @@ const styles = StyleSheet.create({
   },
 
   logo : {
-    width: 140, 
-    height: 45,
-    marginTop: 5
+    width: 175, 
+    height: 56,
+    marginTop: 90
   },
 
   form : {
-    marginTop : 10,
+    marginTop : 40,
     alignSelf: 'center',
     justifyContent : 'space-around',
     flexDirection : 'column'
