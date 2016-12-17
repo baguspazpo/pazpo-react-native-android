@@ -12,9 +12,35 @@ import {
   View,
   BackAndroid
 } from 'react-native';
+import AccountKit from 'react-native-facebook-account-kit'
 
 class Login extends Component {
-    componentWillMount(){
+
+  getPhoneNumber = (token) => {
+    fetch('https://graph.accountkit.com/v1.1/me/?access_token='+token)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.checkPhoneNumber('0'+responseJson.phone.national_number);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  checkPhoneNumber(phoneNumber) {
+    fetch('http://223.27.24.155/api_pazpo/v2/LoginProcess?pMobilePhone='+phoneNumber)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        console.log(responseJson);
+        Alert.alert('LOGIN SUKSES LANJUT KE HOME');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  componentWillMount(){
+      AccountKit.configure({})
       
       BackAndroid.addEventListener('hardwareBackPress', () => {
         console.log(this.props.navigator.getCurrentRoutes().length);
@@ -22,25 +48,26 @@ class Login extends Component {
               this.props.navigator.pop();
               return true;
           }
-
           return false;
       });
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native! { this.props.message }
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
+      AccountKit.loginWithPhone()
+      .then((token) => {
+        if (!token) {
+          Alert.alert('User membatalkan login.');
+        } else {
+          this.getPhoneNumber(token.token)
+        }
+      })
+      .catch((e) => {
+        if (e.code != 'cancel') {
+        Alert.alert('Login gagal! Silahkan coba kembali.')
+        }
+        console.log('Failed to login', e)
+      })
     );
   }
 }

@@ -93,18 +93,30 @@ class Register extends Component {
               style={styles.TextInput}
               onChangeText={(nama) => this.setState({nama})}
               placeholder="Nama"
+              autoCapitalize="words"
+              returnKeyType="next"
+              underlineColorAndroid="#FFD43A"
+              selectionColor="#FFD43A"
             />
 
             <TextInput
               style={styles.TextInput}
               onChangeText={(hp) => this.setState({hp})}
               placeholder="No Handphone"
+              keyboardType="phone-pad"
+              returnKeyType="next"
+              underlineColorAndroid="#FFD43A"
+              selectionColor="#FFD43A"
             />
 
             <TextInput
               style={styles.TextInput}
               onChangeText={(email) => this.setState({email})}
               placeholder="Email"
+              keyboardType="email-address"
+              returnKeyType="done"
+              underlineColorAndroid="#FFD43A"
+              selectionColor="#FFD43A"
             />
 
             <Picker
