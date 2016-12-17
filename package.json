@@ -12,6 +12,7 @@
     "react-native": "0.38.0",
     "react-native-image-picker": "^0.24.1",
     "react-native-selectme": "^1.2.3",
+    "react-native-facebook-account-kit": "^0.5.2",
     "rn-viewpager": "^1.1.4"
   },
   "jest": {
