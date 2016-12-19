@@ -14,6 +14,7 @@ import {
   Image,
   TouchableHighlight
 } from 'react-native';
+import FormData from 'FormData';
 
 var Platform = require('react-native').Platform;
 var ImagePicker = require('react-native-image-picker');
@@ -28,22 +29,13 @@ var options = {
 
 class IdentityCard extends Component {
 
-    uploadIdentityCard(){
-      fetch('https://mywebsite.com/endpoint/', {
-        method: 'POST',
-        body: JSON.stringify({
-          firstParam: 'yourValue',
-          secondParam: 'yourOtherValue',
-        })
-      })
-    }
-
-    constructor(props) {
-        super(props);
-        this.state = { 
-            avatarSource: '',
-        };
-    }
+  constructor(props) {
+    super(props);
+    this.state = { 
+        avatarSource: '',
+        filenameImg: '',
+    };
+  }
 
   launchImagePicker(){
     ImagePicker.showImagePicker(options, (response) => {
@@ -51,15 +43,12 @@ class IdentityCard extends Component {
 
       if (response.didCancel) {
         console.log('User cancelled image picker');
-      }
-      else if (response.error) {
+      }else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
-      }
-      else if (response.customButton) {
+      }else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
-      }
-      else {
-        console.log("sudah pilih gambar");
+      }else {
+        console.log('ready to call api');
         // You can display the image using either data...
         const source = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true};
 
@@ -70,12 +59,31 @@ class IdentityCard extends Component {
           const source = {uri: response.uri, isStatic: true};
         }
 
-        this.setState({
-          avatarSource: source
-        });
+        var photo = {
+          uri: response.uri,
+          type: response.type,
+          name: response.fileName,
+        };
+
+        var formData = new FormData();
+        formData.append('image', photo);
+
+        fetch('http://223.27.24.155/assets/uploader/pazpo_upload/identity.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          console.log(responseJson.data);
+          this.setState({ filenameImg: responseJson.data });
+        })
+        .catch((error) => {
+          console.error(error);
+        });  
       }
+
     });
-}
+  }
 
   componentWillMount(){
       BackAndroid.addEventListener('hardwareBackPress', () => {
