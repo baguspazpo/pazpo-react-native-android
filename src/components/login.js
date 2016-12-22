@@ -6,7 +6,6 @@
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   View,
@@ -41,7 +40,7 @@ class Login extends Component {
 
   componentWillMount(){
       AccountKit.configure({})
-
+      
       BackAndroid.addEventListener('hardwareBackPress', () => {
         console.log(this.props.navigator.getCurrentRoutes().length);
           if (this.props.navigator.getCurrentRoutes().length > 1) {

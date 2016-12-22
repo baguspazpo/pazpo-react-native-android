@@ -28,15 +28,32 @@ class Register extends Component {
     })
   }
 
-  submitRegister(id, name, email, hp,) {
-    this.props.navigator.push({
-        id: id, passProps: {
-                  name : name,
-                  email : email,
-                  hp : hp,
-                  goBack: this.goBack,
-                }
-    })
+  submitRegister(id, name, email, hp, province, company) {
+    if (name == ""){
+      Alert.alert ("Nama tidak boleh kosong");
+    } else if (hp == "") {
+      Alert.alert ("Nomor Handphone tidak boleh kosong");
+    } else if (email == "") {
+      Alert.alert ("Email tidak boleh kosong");
+    } else if (province == "") {
+      Alert.alert ("Pilih Provinsi terlebih dahulu");
+    } else if (company == "") {
+      Alert.alert ("Pilih Company terlebih dahulu");
+    }else {
+      this.props.navigator.push({
+        id: id, 
+        passProps: 
+        {
+          name : name,
+          email : email,
+          hp : hp,
+          province : province,
+          company : company,
+          goBack: this.goBack,
+        }
+      })
+    }
+    
   }
 
   goBack() {
@@ -45,10 +62,10 @@ class Register extends Component {
 
   constructor(props) {
         super(props);
-        this.state = {
-            nama: 'Nama',
-            hp : 'No Handphone',
-            email : 'Email',
+        this.state = { 
+            nama: '',
+            hp : '',
+            email : '',
             province: [],
             company: [],
             selectedProvince: '',
@@ -63,20 +80,10 @@ class Register extends Component {
         .then((response) => response.json())
         .then((responseJson) => {
           this.setState({ province: responseJson.province.data });
-          this.apiCompany(1);
         })
         .catch((error) => {
           console.error(error);
         });
-    }
-
-    onValueChange = (key: string, value: string) => {
-      const newState = {};
-      newState[key] = value;
-      this.setState(newState);
-      if (key == "selectedProvince") {
-        this.apiCompany(value);
-      }
     }
 
     apiCompany(pProvinceID){
@@ -161,18 +168,21 @@ class Register extends Component {
             />
 
             <Picker
-              selectedValue={this.state.selectedProvince}
-              mode="dropdown"
-              onValueChange={this.onValueChange.bind(this, 'selectedProvince')}>
-              {this.state.province.map((l,i) => {return <Picker.Item value={l.ProvinceID} label={l.ProvinceName} key={l.ProvinceID}  /> })}
+                selectedValue={this.state.selectedProvince}
+                mode="dropdown"
+                onValueChange={this.onValueChangeArea.bind(this, 'selectedProvince')}>
+                
+                {this.state.province.map((l,i) => {return <Picker.Item value={l.ProvinceID} label={l.ProvinceName} key={l.ProvinceID}  /> })}
             </Picker>
 
             <Picker
               selectedValue={this.state.selectedCompany}
               mode="dropdown"
-              onValueChange={this.onValueChange.bind(this, 'selectedCompany')}>
+              onValueChange={this.onValueChangeCompany.bind(this, 'selectedCompany')}>
               {this.state.company.map((l,i) => {return <Picker.Item value={l.CompanyID} label={l.CompanyName} key={l.CompanyID}  /> })}
+              
             </Picker>
+
 
         </View>
 

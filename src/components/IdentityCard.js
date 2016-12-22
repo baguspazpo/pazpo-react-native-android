@@ -6,13 +6,12 @@
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   View,
   BackAndroid,
   Image,
-  TouchableHighlight
+  TouchableHighlight,
 } from 'react-native';
 import FormData from 'FormData';
 
@@ -37,9 +36,20 @@ class IdentityCard extends Component {
     };
   }
 
+  submitRegister(name, email, hp, province, company, imgIdentityCard){
+    fetch('http://223.27.24.155/api_pazpo/v2/CreateAgentRegistration?pFullName='+ name + '&pEmail=' + email + '&pCompanyID=' +company+ '&pMobilePhone=' + hp + '&pNameCard=' + imgIdentityCard)
+        .then((response) => response.json())
+        .then((responseJson) => {
+          console.log(responseJson);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+  }
+
   launchImagePicker(){
     ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
+      console.log(this.props.name);
 
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -74,8 +84,8 @@ class IdentityCard extends Component {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-          console.log(responseJson.data);
-          this.setState({ filenameImg: responseJson.data });
+          this.setState({ filenameImg: responseJson.data.filename });
+          console.log(this.state.filenameImg);
         })
         .catch((error) => {
           console.error(error);
