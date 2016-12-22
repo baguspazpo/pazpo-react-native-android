@@ -7,18 +7,25 @@
 import { Text, AppRegistry, Image, StyleSheet, View, TextInput, Button, Alert, Navigator,
     TouchableHighlight, Picker, TouchableOpacity} from 'react-native';
 import React, {Component} from 'react';
+import AccountKit from 'react-native-facebook-account-kit'
 
 class Register extends Component {
 
-  
-
-  login(id, message) {
-    this.props.navigator.push({
-        id: id, passProps: {
-                  message: message,
-                  goBack: this.goBack,
-                }
-        })
+  login() {
+    AccountKit.loginWithPhone()
+    .then((token) => {
+      if (!token) {
+        Alert.alert('User membatalkan login.');
+      } else {
+        this.getPhoneNumber(token.token)
+      }
+    })
+    .catch((e) => {
+      if (e.code != 'cancel') {
+      Alert.alert('Login gagal! Silahkan coba kembali.')
+      }
+      console.log('Failed to login', e)
+    })
   }
 
   submitRegister(id, name, email, hp,) {
@@ -35,10 +42,10 @@ class Register extends Component {
   goBack() {
       this.props.navigator.pop()
   }
-    
+
   constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             nama: 'Nama',
             hp : 'No Handphone',
             email : 'Email',
@@ -51,14 +58,25 @@ class Register extends Component {
 
     componentWillMount() {
       console.log('test');
+      AccountKit.configure({})
       fetch('http://223.27.24.155/api_pazpo/v2/LoadAllCompanyArea')
         .then((response) => response.json())
         .then((responseJson) => {
           this.setState({ province: responseJson.province.data });
+          this.apiCompany(1);
         })
         .catch((error) => {
           console.error(error);
         });
+    }
+
+    onValueChange = (key: string, value: string) => {
+      const newState = {};
+      newState[key] = value;
+      this.setState(newState);
+      if (key == "selectedProvince") {
+        this.apiCompany(value);
+      }
     }
 
     apiCompany(pProvinceID){
@@ -74,6 +92,28 @@ class Register extends Component {
         });
     }
 
+    getPhoneNumber = (token) => {
+      fetch('https://graph.accountkit.com/v1.1/me/?access_token='+token)
+        .then((response) => response.json())
+        .then((responseJson) => {
+          this.checkPhoneNumber('0'+responseJson.phone.national_number);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+
+    checkPhoneNumber(phoneNumber) {
+      fetch('http://223.27.24.155/api_pazpo/v2/LoginProcess?pMobilePhone='+phoneNumber)
+        .then((response) => response.json())
+        .then((responseJson) => {
+          console.log(responseJson);
+          Alert.alert('LOGIN SUKSES LANJUT KE HOME');
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
 
   render() {
     return (
@@ -121,21 +161,18 @@ class Register extends Component {
             />
 
             <Picker
-                selectedValue={this.state.selectedProvince}
-                mode="dropdown"
-                onValueChange={this.onValueChangeArea.bind(this, 'selectedProvince')}>
-                
-                    {this.state.province.map((l,i) => {return <Picker.Item value={l.ProvinceID} label={l.ProvinceName} key={l.ProvinceID}  /> })}
+              selectedValue={this.state.selectedProvince}
+              mode="dropdown"
+              onValueChange={this.onValueChange.bind(this, 'selectedProvince')}>
+              {this.state.province.map((l,i) => {return <Picker.Item value={l.ProvinceID} label={l.ProvinceName} key={l.ProvinceID}  /> })}
             </Picker>
 
             <Picker
-              selectedValue={this.state.cities}
+              selectedValue={this.state.selectedCompany}
               mode="dropdown"
-              onValueChange={this.onValueChangeCompany.bind(this, 'selectedCompany')}>
+              onValueChange={this.onValueChange.bind(this, 'selectedCompany')}>
               {this.state.company.map((l,i) => {return <Picker.Item value={l.CompanyID} label={l.CompanyName} key={l.CompanyID}  /> })}
-              
             </Picker>
-
 
         </View>
 
@@ -148,33 +185,18 @@ class Register extends Component {
               Sudah Punya Akun ?
             </Text>
 
-            <TouchableHighlight onPress={ () => this.login('login', 'This is the login page!') }>
+            <TouchableHighlight onPress={ () => this.login() }>
               <View>
                 <Text style={styles.logintext}>LOG IN</Text>
               </View>
             </TouchableHighlight>
         </View>
-       
+
        </View>
-        
+
     );
   }
 
-
-  onValueChangeArea = (key: string, value: string) => {
-    const newState = {};
-    newState[key] = value;
-    this.setState(newState);
-
-    this.apiCompany(value);
-    
-  };
-
-  onValueChangeCompany = (key: string, value: string) => {
-    const newState = {};
-    newState[key] = value;
-    this.setState(newState);
-  };
 }
 
 const styles = StyleSheet.create({
@@ -191,9 +213,8 @@ const styles = StyleSheet.create({
   },
 
   logo : {
-    width: 175, 
+    width: 175,
     height: 56,
-    marginTop: 90
   },
 
   form : {
@@ -244,4 +265,3 @@ const styles = StyleSheet.create({
 });
 
 export default Register;
-

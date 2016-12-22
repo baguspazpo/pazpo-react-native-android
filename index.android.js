@@ -16,20 +16,16 @@ export default class AwesomeProject extends Component {
        return (<Register navigator={navigator}/>);
      }
 
-    if (routeId === 'login') {
-       return (<Login {...route.passProps} navigator={navigator}/>);  
-    } 
-
-    if (routeId === 'identityCard'){
-      return (<IdentityCard {...route.passProps} navigator={navigator}/>); 
-
-    }
+     if (routeId === 'identityCard') {
+       return (<IdentityCard {...route.passProps} navigator={navigator}/>);
+     }
   }
 
   render() {
     return (
         <Navigator
         initialRoute={{ id:'register', name: 'register', component: Register }}
+        configureScene={ (route, navigator) => Navigator.SceneConfigs.FloatFromBottomAndroid }
         renderScene={ (route, navigator) => this._renderScene(route, navigator) }
         />
     );
@@ -38,6 +34,4 @@ export default class AwesomeProject extends Component {
 
 }
 
-AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject); 
-
-
+AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);

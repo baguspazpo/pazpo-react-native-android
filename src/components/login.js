@@ -41,7 +41,7 @@ class Login extends Component {
 
   componentWillMount(){
       AccountKit.configure({})
-      
+
       BackAndroid.addEventListener('hardwareBackPress', () => {
         console.log(this.props.navigator.getCurrentRoutes().length);
           if (this.props.navigator.getCurrentRoutes().length > 1) {
@@ -92,4 +92,3 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
-
