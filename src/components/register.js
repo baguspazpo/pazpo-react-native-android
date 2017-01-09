@@ -5,7 +5,7 @@
  */
 
 import { Text, AppRegistry, Image, StyleSheet, View, TextInput, Button, Alert, Navigator,
-    TouchableHighlight, Picker, TouchableOpacity} from 'react-native';
+    TouchableHighlight, Picker, TouchableOpacity, ToastAndroid} from 'react-native';
 import React, {Component} from 'react';
 import AccountKit from 'react-native-facebook-account-kit'
 
@@ -122,8 +122,17 @@ class Register extends Component {
       fetch('http://223.27.24.155/api_pazpo/v2/LoginProcess?pMobilePhone='+phoneNumber)
         .then((response) => response.json())
         .then((responseJson) => {
+          if (responseJson.status == "Success") {
+            this.props.navigator.push({
+              id: 'home',
+              passProps: {
+                goBack: this.goBack,
+              }
+            })
+          } else {
+            ToastAndroid.show(responseJson.description, ToastAndroid.SHORT);
+          }
           console.log(responseJson);
-          Alert.alert('LOGIN SUKSES LANJUT KE HOME');
         })
         .catch((error) => {
           console.error(error);

@@ -107,7 +107,6 @@ class IdentityCard extends Component {
           if (responseJson.status == 'error') {
             ToastAndroid.show('Upload Foto Gagal!', ToastAndroid.SHORT);
           } else if (responseJson.status == 'success') {
-            ToastAndroid.show('Upload Foto Sukses!', ToastAndroid.SHORT);
             this.submitRegister(this.props.name, this.props.email, this.props.hp, this.props.province, this.props.company, responseJson.data.filename);
           }
         })
