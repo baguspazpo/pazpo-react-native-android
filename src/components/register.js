@@ -39,10 +39,10 @@ class Register extends Component {
       Alert.alert ("Pilih Provinsi terlebih dahulu");
     } else if (company == "") {
       Alert.alert ("Pilih Company terlebih dahulu");
-    }else {
+    } else {
       this.props.navigator.push({
-        id: id, 
-        passProps: 
+        id: id,
+        passProps:
         {
           name : name,
           email : email,
@@ -53,7 +53,6 @@ class Register extends Component {
         }
       })
     }
-    
   }
 
   goBack() {
@@ -62,7 +61,7 @@ class Register extends Component {
 
   constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             nama: '',
             hp : '',
             email : '',
@@ -74,16 +73,25 @@ class Register extends Component {
     }
 
     componentWillMount() {
-      console.log('test');
       AccountKit.configure({})
       fetch('http://223.27.24.155/api_pazpo/v2/LoadAllCompanyArea')
         .then((response) => response.json())
         .then((responseJson) => {
           this.setState({ province: responseJson.province.data });
+          this.apiCompany(1);
         })
         .catch((error) => {
           console.error(error);
         });
+    }
+
+    onValueChange = (key: string, value: string) => {
+      const newState = {};
+      newState[key] = value;
+      this.setState(newState);
+      if (key == "selectedProvince") {
+        this.apiCompany(value);
+      }
     }
 
     apiCompany(pProvinceID){
@@ -170,23 +178,22 @@ class Register extends Component {
             <Picker
                 selectedValue={this.state.selectedProvince}
                 mode="dropdown"
-                onValueChange={this.onValueChangeArea.bind(this, 'selectedProvince')}>
-                
+                onValueChange={this.onValueChange.bind(this, 'selectedProvince')}>
+
                 {this.state.province.map((l,i) => {return <Picker.Item value={l.ProvinceID} label={l.ProvinceName} key={l.ProvinceID}  /> })}
             </Picker>
 
             <Picker
               selectedValue={this.state.selectedCompany}
               mode="dropdown"
-              onValueChange={this.onValueChangeCompany.bind(this, 'selectedCompany')}>
+              onValueChange={this.onValueChange.bind(this, 'selectedCompany')}>
               {this.state.company.map((l,i) => {return <Picker.Item value={l.CompanyID} label={l.CompanyName} key={l.CompanyID}  /> })}
-              
-            </Picker>
 
+            </Picker>
 
         </View>
 
-        <TouchableOpacity style={styles.buttonSubmit} onPress = {() => this.submitRegister('identityCard', this.state.nama, this.state.email, this.state.hp)}>
+        <TouchableOpacity style={styles.buttonSubmit} onPress = {() => this.submitRegister('identityCard', this.state.nama, this.state.email, this.state.hp, this.state.selectedProvince, this.state.selectedCompany)}>
           <Text style={styles.daftar}>DAFTAR</Text>
         </TouchableOpacity>
 

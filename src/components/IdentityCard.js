@@ -12,6 +12,8 @@ import {
   BackAndroid,
   Image,
   TouchableHighlight,
+  Alert,
+  ToastAndroid,
 } from 'react-native';
 import FormData from 'FormData';
 
@@ -30,17 +32,35 @@ class IdentityCard extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { 
+    this.state = {
         avatarSource: '',
         filenameImg: '',
     };
   }
 
   submitRegister(name, email, hp, province, company, imgIdentityCard){
-    fetch('http://223.27.24.155/api_pazpo/v2/CreateAgentRegistration?pFullName='+ name + '&pEmail=' + email + '&pCompanyID=' +company+ '&pMobilePhone=' + hp + '&pNameCard=' + imgIdentityCard)
+    fetch('http://223.27.24.155/api_pazpo/v2/CreateAgentRegistration?pFullName='+ name + '&pEmail=' + email + '&pCompanyID=' + company + '&pMobilePhone=' + hp + '&pKTP=&pNameCard=' + imgIdentityCard + '&pCreatedBy=' + email)
         .then((response) => response.json())
         .then((responseJson) => {
           console.log(responseJson);
+          if (responseJson.status == 'Error') {
+            ToastAndroid.show(responseJson.description, ToastAndroid.SHORT);
+            this.props.navigator.push({
+              id: 'register',
+              passProps: {
+                goBack: this.goBack,
+              }
+            })
+          } else if (responseJson.status == 'Success') {
+            this.props.navigator.push({
+              id: 'register',
+              passProps: {
+                hp: responseJson.data.MobilePhone,
+                email: responseJson.data.UserID,
+                goBack: this.goBack,
+              }
+            })
+          }
         })
         .catch((error) => {
           console.error(error);
@@ -49,16 +69,15 @@ class IdentityCard extends Component {
 
   launchImagePicker(){
     ImagePicker.showImagePicker(options, (response) => {
-      console.log(this.props.name);
 
       if (response.didCancel) {
         console.log('User cancelled image picker');
-      }else if (response.error) {
+      } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
-      }else if (response.customButton) {
+      } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
-      }else {
-        console.log('ready to call api');
+      } else {
+        console.log('Ready to call api');
         // You can display the image using either data...
         const source = {uri: 'data:image/jpeg;base64,' + response.data, isStatic: true};
 
@@ -84,12 +103,17 @@ class IdentityCard extends Component {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-          this.setState({ filenameImg: responseJson.data.filename });
-          console.log(this.state.filenameImg);
+          console.log(responseJson);
+          if (responseJson.status == 'error') {
+            ToastAndroid.show('Upload Foto Gagal!', ToastAndroid.SHORT);
+          } else if (responseJson.status == 'success') {
+            ToastAndroid.show('Upload Foto Sukses!', ToastAndroid.SHORT);
+            this.submitRegister(this.props.name, this.props.email, this.props.hp, this.props.province, this.props.company, responseJson.data.filename);
+          }
         })
         .catch((error) => {
           console.error(error);
-        });  
+        });
       }
 
     });
@@ -145,7 +169,7 @@ const styles = StyleSheet.create({
 
   },
   kamera : {
-    width: 150, 
+    width: 150,
     height: 150,
   },
 
@@ -157,4 +181,3 @@ const styles = StyleSheet.create({
 });
 
 export default IdentityCard;
-

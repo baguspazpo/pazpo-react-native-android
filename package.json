@@ -13,7 +13,7 @@
     "react-native-action-button": "^2.0.17",
     "react-native-facebook-account-kit": "^0.5.2",
     "react-native-image-picker": "^0.24.1",
-    "react-native-scrollable-tab-view": "^0.7.0",
+    "react-native-scrollable-tab-view": "^0.7.0"
   },
   "jest": {
     "preset": "react-native"
